@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Cookiegram</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .sales-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .sales-card {
+            background: linear-gradient(135deg, var(--primary-brown) 0%, var(--primary-brown-dark) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+        }
+        .sales-card.revenue {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+        }
+        .sales-card.profit {
+            background: linear-gradient(135deg, #FF9800 0%, #E65100 100%);
+        }
+        .sales-card .icon {
+            font-size: 2rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+        .sales-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        .sales-card .label {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9m0-1C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                <circle cx="8" cy="10" r="1.5"/>
+                <circle cx="12" cy="8" r="1.5"/>
+                <circle cx="15" cy="11" r="1.5"/>
+                <circle cx="10" cy="14" r="1.5"/>
+                <circle cx="14" cy="15" r="1.5"/>
+            </svg>
+            <span class="logo-text">Cookiegram</span>
+        </a>
+        <ul class="nav-links">
+            <li><a th:href="@{/admin/dashboard}" data-testid="nav-dashboard">Dashboard</a></li>
+            <li><a th:href="@{/admin/reports}" data-testid="nav-reports">Reports</a></li>
+            <li><a th:href="@{/logout}" class="btn btn-outline" data-testid="logout-btn">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="dashboard-container" data-testid="admin-dashboard">
+        <div class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+            <p>Welcome back, <span th:text="${username}">Admin</span>!</p>
+        </div>
+
+        <!-- Sales Dashboard Cards -->
+        <div class="sales-cards" data-testid="sales-dashboard">
+            <div class="sales-card">
+                <i class="fas fa-shopping-cart icon"></i>
+                <div class="value" th:text="${totalOrdersYTD}" data-testid="total-orders-ytd">0</div>
+                <div class="label">Total Orders (YTD)</div>
+            </div>
+            <div class="sales-card revenue">
+                <i class="fas fa-dollar-sign icon"></i>
+                <div class="value" data-testid="total-revenue">
+                    $<span th:text="${#numbers.formatDecimal(totalRevenue, 1, 2)}">0.00</span>
+                </div>
+                <div class="label">Total Revenue</div>
+            </div>
+            <div class="sales-card profit">
+                <i class="fas fa-chart-line icon"></i>
+                <div class="value" data-testid="estimated-profit">
+                    $<span th:text="${#numbers.formatDecimal(estimatedProfit, 1, 2)}">0.00</span>
+                </div>
+                <div class="label">Estimated Profit</div>
+            </div>
+            <div class="sales-card" style="background: linear-gradient(135deg, #2196F3 0%, #1565C0 100%);">
+                <i class="fas fa-calendar-day icon"></i>
+                <div class="value" th:text="${todayOrders}" data-testid="today-orders">0</div>
+                <div class="label">Today's Orders</div>
+            </div>
+        </div>
+
+        <!-- Action Cards -->
+        <div class="action-cards">
+            <a th:href="@{/admin/reports}" class="action-card" data-testid="reports-card">
+                <svg class="action-card-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                </svg>
+                <h3>View Reports</h3>
+                <p class="text-muted">Analytics & Insights</p>
+            </a>
+            <div class="action-card" style="cursor: default;">
+                <svg class="action-card-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                </svg>
+                <h3 th:text="${totalUsers}">0</h3>
+                <p class="text-muted">Active Users</p>
+            </div>
+            <div class="action-card" style="cursor: default;">
+                <svg class="action-card-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+                <h3>30</h3>
+                <p class="text-muted">Daily Capacity</p>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- User Management -->
+            <div class="content-card" data-testid="user-management">
+                <div class="content-card-header">
+                    <h2>Recent Users</h2>
+                </div>
+                <div th:if="${#lists.isEmpty(recentUsers)}" class="empty-state">
+                    <p>No users found</p>
+                </div>
+                <ul th:if="${!#lists.isEmpty(recentUsers)}" class="user-list">
+                    <li th:each="user : ${recentUsers}">
+                        <span th:text="${user.fullName}">User Name</span>
+                        <span class="badge"
+                              th:classappend="${user.role.name() == 'ROLE_ADMIN'} ? 'badge-admin' : (${user.role.name() == 'ROLE_EMPLOYEE'} ? 'badge-employee' : 'badge-pending')"
+                              th:text="${user.role.name() == 'ROLE_ADMIN'} ? 'Admin' : (${user.role.name() == 'ROLE_EMPLOYEE'} ? 'Employee' : 'Customer')">Role</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- System Overview -->
+            <div class="content-card" data-testid="system-overview">
+                <div class="content-card-header">
+                    <h2>System Overview</h2>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Total Orders YTD</span>
+                    <span class="stat-value" th:text="${totalOrdersYTD}">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Active Users</span>
+                    <span class="stat-value" th:text="${totalUsers}">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Total Revenue</span>
+                    <span class="stat-value">$<span th:text="${#numbers.formatDecimal(totalRevenue, 1, 2)}">0.00</span></span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Estimated Profit</span>
+                    <span class="stat-value">$<span th:text="${#numbers.formatDecimal(estimatedProfit, 1, 2)}">0.00</span></span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Daily Capacity Limit</span>
+                    <span class="stat-value">30 <i class="fas fa-lock" style="font-size: 0.8rem; opacity: 0.5;"></i></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Preview -->
+        <div class="content-card" data-testid="reports-preview">
+            <div class="content-card-header">
+                <h2>Reports Overview</h2>
+                <a th:href="@{/admin/reports}">View Full Reports</a>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div style="background: var(--accent-cream); padding: 1.5rem; border-radius: var(--border-radius); text-align: center;">
+                    <i class="fas fa-chart-line" style="font-size: 2rem; color: var(--primary-brown); margin-bottom: 0.5rem;"></i>
+                    <h4>Sales by Day</h4>
+                    <p style="color: var(--text-light); font-size: 0.9rem;">View daily trends</p>
+                </div>
+                <div style="background: var(--accent-cream); padding: 1.5rem; border-radius: var(--border-radius); text-align: center;">
+                    <i class="fas fa-trophy" style="font-size: 2rem; color: var(--primary-brown); margin-bottom: 0.5rem;"></i>
+                    <h4>Best Selling Day</h4>
+                    <p style="color: var(--text-light); font-size: 0.9rem;">Peak performance</p>
+                </div>
+                <div style="background: var(--accent-cream); padding: 1.5rem; border-radius: var(--border-radius); text-align: center;">
+                    <i class="fas fa-calendar-check" style="font-size: 2rem; color: var(--primary-brown); margin-bottom: 0.5rem;"></i>
+                    <h4>Weekly Analysis</h4>
+                    <p style="color: var(--text-light); font-size: 0.9rem;">Weekly patterns</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Promotions -->
+        <div class="content-card">
+            <div class="content-card-header">
+                <h2>Current Promotions</h2>
+            </div>
+            <div th:if="${#lists.isEmpty(promotions)}" class="empty-state">
+                <p>No active promotions</p>
+            </div>
+            <div th:if="${!#lists.isEmpty(promotions)}" class="promotions-grid" style="gap: 1rem;">
+                <div th:each="promo : ${promotions}" class="promo-card">
+                    <img th:src="${promo.imageUrl != null ? promo.imageUrl : 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&h=200&fit=crop'}"
+                         th:alt="${promo.title}" class="promo-image">
+                    <div class="promo-content">
+                        <h3 class="promo-title" th:text="${promo.title}">Promotion</h3>
+                        <p class="promo-description" th:text="${promo.description}">Description</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

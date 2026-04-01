@@ -1,0 +1,21 @@
+services:
+  mongodb:
+    image: cookigramsp3-mongo:latest
+    container_name: cookigramsp3-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - cookigramsp3_mongo_data:/data/db
+
+  app:
+    image: cookigramsp3-app:latest
+    container_name: cookigramsp3-app
+    depends_on:
+      - mongodb
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/cookigramdb
+
+volumes:
+  cookigramsp3_mongo_data:

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Order - Cookiegram</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9m0-1C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                <circle cx="8" cy="10" r="1.5"/>
+                <circle cx="12" cy="8" r="1.5"/>
+                <circle cx="15" cy="11" r="1.5"/>
+                <circle cx="10" cy="14" r="1.5"/>
+                <circle cx="14" cy="15" r="1.5"/>
+            </svg>
+            <span class="logo-text">Cookiegram</span>
+        </a>
+        <ul class="nav-links">
+            <li><a th:href="@{/customer/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/logout}" class="btn btn-outline">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="order-container">
+        <div class="progress-steps">
+            <div class="step completed"><div class="step-circle"><i class="fas fa-check"></i></div><span>Order Details</span></div>
+            <div class="step-line active"></div>
+            <div class="step active"><div class="step-circle">2</div><span>Review</span></div>
+            <div class="step-line"></div>
+            <div class="step"><div class="step-circle">3</div><span>Payment</span></div>
+            <div class="step-line"></div>
+            <div class="step"><div class="step-circle">4</div><span>Confirmation</span></div>
+        </div>
+
+        <div class="order-card">
+            <h1><i class="fas fa-clipboard-check"></i> Review Your Order</h1>
+            <p class="subtitle">Please confirm your order details before proceeding to payment</p>
+
+            <div class="review-section">
+                <div class="review-item">
+                    <div class="review-icon"><i class="fas fa-calendar-day"></i></div>
+                    <div class="review-content">
+                        <h3>Delivery Date</h3>
+                        <p th:text="${#temporals.format(orderForm.deliveryDate, 'EEEE, MMMM dd, yyyy')}">Monday, January 15, 2026</p>
+                    </div>
+                </div>
+                <div class="review-item">
+                    <div class="review-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="review-content">
+                        <h3>Delivery Address</h3>
+                        <p th:text="${orderForm.streetAddress}">123 Main Street</p>
+                        <p th:if="${orderForm.apartmentSuite != null and !orderForm.apartmentSuite.isEmpty()}" th:text="${orderForm.apartmentSuite}">Apt 4B</p>
+                        <p>
+                            <span th:text="${orderForm.city}">Toronto</span>,
+                            <span th:text="${orderForm.province}">ON</span>
+                            <span th:text="${orderForm.formattedPostalCode}">M5V 1A1</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="review-item">
+                    <div class="review-icon"><i class="fas fa-comment-dots"></i></div>
+                    <div class="review-content">
+                        <h3>Custom Message</h3>
+                        <p class="message-preview" th:text="${orderForm.customMessage}">Happy Birthday!</p>
+                    </div>
+                </div>
+                <div class="review-item price-item">
+                    <div class="review-icon"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="review-content">
+                        <h3>Total Price</h3>
+                        <p class="price" th:text="'$' + ${price} + ' CAD'">$24.99 CAD</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <form th:action="@{/customer/order/review/edit}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-secondary"><i class="fas fa-edit"></i> Edit Order</button>
+                </form>
+                <a th:href="@{/customer/order/payment}" class="btn btn-primary">
+                    Continue to Payment <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .order-container { max-width: 700px; margin: 0 auto; padding: 2rem; }
+        .progress-steps { display: flex; align-items: center; justify-content: center; margin-bottom: 2rem; gap: 0.5rem; }
+        .step { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+        .step-circle { width: 36px; height: 36px; border-radius: 50%; background: #E0D5C7; color: var(--text-medium); display: flex; align-items: center; justify-content: center; font-weight: 600; }
+        .step.active .step-circle { background: var(--primary-brown); color: white; }
+        .step.completed .step-circle { background: var(--success-green); color: white; }
+        .step span { font-size: 0.85rem; color: var(--text-medium); }
+        .step.active span, .step.completed span { color: var(--primary-brown); font-weight: 600; }
+        .step-line { width: 60px; height: 2px; background: #E0D5C7; }
+        .step-line.active { background: var(--success-green); }
+        .order-card { background: var(--bg-paper); border-radius: var(--border-radius-lg); padding: 2.5rem; box-shadow: var(--shadow-lg); }
+        .order-card h1 { text-align: center; margin-bottom: 0.5rem; }
+        .subtitle { text-align: center; color: var(--text-medium); margin-bottom: 2rem; }
+        .review-item { display: flex; gap: 1.5rem; padding: 1.25rem; background: white; border-radius: var(--border-radius); margin-bottom: 1rem; box-shadow: var(--shadow-sm); }
+        .review-icon { width: 50px; height: 50px; background: var(--accent-cream); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .review-icon i { font-size: 1.25rem; color: var(--primary-brown); }
+        .review-content h3 { font-size: 0.9rem; color: var(--text-light); margin-bottom: 0.25rem; font-weight: 500; }
+        .message-preview { font-style: italic; background: var(--accent-cream); padding: 0.75rem 1rem; border-radius: var(--border-radius); border-left: 3px solid var(--primary-brown); }
+        .price-item { background: linear-gradient(135deg, var(--primary-brown) 0%, var(--primary-brown-dark) 100%); }
+        .price-item .review-icon { background: rgba(255,255,255,0.2); }
+        .price-item .review-icon i { color: white; }
+        .price-item .review-content h3 { color: rgba(255,255,255,0.8); }
+        .price-item .price { font-size: 1.75rem; font-weight: 700; color: white; }
+        .form-actions { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; }
+    </style>
+</body>
+</html>

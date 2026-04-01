@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Analytics - Cookiegram</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .date-filter-form {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-medium);
+            font-size: 0.9rem;
+        }
+        .filter-group input {
+            padding: 0.75rem;
+            border: 2px solid #E0D5C7;
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+        }
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary-brown);
+        }
+        .report-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .summary-box {
+            background: var(--bg-paper);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--primary-brown);
+        }
+        .summary-box.highlight {
+            border-left-color: var(--success-green);
+            background: #E8F5E9;
+        }
+        .summary-box .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-brown);
+        }
+        .summary-box.highlight .value {
+            color: #2E7D32;
+        }
+        .summary-box .label {
+            color: var(--text-medium);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+        .chart-container {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .chart-label {
+            width: 100px;
+            font-size: 0.85rem;
+            color: var(--text-medium);
+            flex-shrink: 0;
+        }
+        .chart-bar-container {
+            flex: 1;
+            background: #E0D5C7;
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-right: 1rem;
+        }
+        .chart-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-brown) 0%, var(--accent-orange) 100%);
+            border-radius: 12px;
+            transition: width 0.5s ease;
+        }
+        .chart-value {
+            width: 50px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary-brown);
+        }
+        .weekly-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .weekly-card {
+            background: var(--accent-cream);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+        }
+        .weekly-card h4 {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            margin-bottom: 0.5rem;
+        }
+        .weekly-card .orders {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-brown);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9m0-1C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                <circle cx="8" cy="10" r="1.5"/>
+                <circle cx="12" cy="8" r="1.5"/>
+                <circle cx="15" cy="11" r="1.5"/>
+                <circle cx="10" cy="14" r="1.5"/>
+                <circle cx="14" cy="15" r="1.5"/>
+            </svg>
+            <span class="logo-text">Cookiegram</span>
+        </a>
+        <ul class="nav-links">
+            <li><a th:href="@{/admin/dashboard}" data-testid="nav-dashboard">Dashboard</a></li>
+            <li><a th:href="@{/admin/reports}" class="active" data-testid="nav-reports">Reports</a></li>
+            <li><a th:href="@{/logout}" class="btn btn-outline" data-testid="logout-btn">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="dashboard-container" data-testid="admin-reports">
+        <div class="dashboard-header">
+            <h1>Reports & Analytics</h1>
+            <p>Analyze your business performance</p>
+        </div>
+
+        <!-- Date Range Filter -->
+        <div class="content-card" data-testid="date-filter">
+            <div class="content-card-header">
+                <h2><i class="fas fa-calendar-alt"></i> Select Date Range</h2>
+            </div>
+            <form th:action="@{/admin/reports}" method="get" class="date-filter-form">
+                <div class="filter-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" name="startDate" th:value="${startDate}" 
+                           required data-testid="start-date-input">
+                </div>
+                <div class="filter-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" name="endDate" th:value="${endDate}" 
+                           required data-testid="end-date-input">
+                </div>
+                <button type="submit" class="btn btn-primary" data-testid="generate-report-btn">
+                    <i class="fas fa-chart-bar"></i> Generate Report
+                </button>
+            </form>
+            
+            <!-- Validation Errors -->
+            <div th:if="${errors}" class="alert alert-error" data-testid="date-validation-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <ul style="margin: 0; padding-left: 1rem;">
+                    <li th:each="error : ${errors}" th:text="${error}">Error message</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- No Data Message -->
+        <div th:if="${hasData != null && !hasData}" class="content-card" data-testid="no-data-message">
+            <div class="empty-state" style="padding: 3rem;">
+                <i class="fas fa-chart-pie" style="font-size: 4rem; color: var(--text-light); margin-bottom: 1rem;"></i>
+                <h3>No Data Available</h3>
+                <p>No orders found for the selected date range. Try adjusting your dates.</p>
+            </div>
+        </div>
+
+        <!-- Report Data -->
+        <div th:if="${hasData != null && hasData}">
+            <!-- Summary Cards -->
+            <div class="report-summary" data-testid="report-summary">
+                <div class="summary-box">
+                    <div class="value" th:text="${reportData.totalOrders}" data-testid="report-total-orders">0</div>
+                    <div class="label">Total Orders</div>
+                </div>
+                <div class="summary-box">
+                    <div class="value" data-testid="report-revenue">
+                        $<span th:text="${#numbers.formatDecimal(reportData.revenue, 1, 2)}">0.00</span>
+                    </div>
+                    <div class="label">Revenue</div>
+                </div>
+                <div class="summary-box">
+                    <div class="value" data-testid="report-profit">
+                        $<span th:text="${#numbers.formatDecimal(reportData.profit, 1, 2)}">0.00</span>
+                    </div>
+                    <div class="label">Estimated Profit</div>
+                </div>
+                <div class="summary-box highlight" th:if="${reportData.highestSellingDay != null}" data-testid="highest-selling-day">
+                    <div class="value" th:text="${reportData.highestSellingDay.value}">0</div>
+                    <div class="label">
+                        Best Day: <span th:text="${#temporals.format(reportData.highestSellingDay.key, 'MMM dd')}">Date</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Per Day Chart -->
+            <div class="content-card" data-testid="orders-per-day">
+                <div class="content-card-header">
+                    <h2><i class="fas fa-chart-bar"></i> Orders Per Day</h2>
+                </div>
+                <div class="chart-container">
+                    <div th:each="entry : ${reportData.ordersPerDay}" class="chart-bar">
+                        <span class="chart-label" th:text="${#temporals.format(entry.key, 'MMM dd')}">Date</span>
+                        <div class="chart-bar-container">
+                            <div class="chart-bar-fill" 
+                                 th:style="${'width: ' + (entry.value > 0 ? (entry.value * 100 / maxOrders) : 0) + '%'}"></div>
+                        </div>
+                        <span class="chart-value" th:text="${entry.value}">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Per Week -->
+            <div class="content-card" data-testid="orders-per-week">
+                <div class="content-card-header">
+                    <h2><i class="fas fa-calendar-week"></i> Orders Per Week</h2>
+                </div>
+                <div class="weekly-grid">
+                    <div th:each="entry : ${reportData.ordersPerWeek}" class="weekly-card">
+                        <h4 th:text="${entry.key}">Week Range</h4>
+                        <span class="orders" th:text="${entry.value}">0</span>
+                        <span class="text-muted"> orders</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Highest Selling Day Highlight -->
+            <div th:if="${reportData.highestSellingDay != null}" class="content-card" data-testid="best-day-highlight">
+                <div class="content-card-header">
+                    <h2><i class="fas fa-trophy" style="color: gold;"></i> Best Selling Day</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2rem; padding: 1rem;">
+                    <div style="background: linear-gradient(135deg, #FFD700 0%, #FFA000 100%); color: white; padding: 2rem; border-radius: var(--border-radius); text-align: center;">
+                        <div style="font-size: 2.5rem; font-weight: 700;" th:text="${reportData.highestSellingDay.value}">0</div>
+                        <div>Orders</div>
+                    </div>
+                    <div>
+                        <h3 th:text="${#temporals.format(reportData.highestSellingDay.key, 'EEEE, MMMM dd, yyyy')}">Date</h3>
+                        <p class="text-muted">This was your best performing day in the selected period!</p>
+                        <p>
+                            <strong>Revenue:</strong> 
+                            $<span th:text="${#numbers.formatDecimal(reportData.highestSellingDay.value * 24.99, 1, 2)}">0.00</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="info-panel">
+            <p><i class="fas fa-info-circle"></i> <strong>Note:</strong> 
+                Reports are based on non-cancelled orders only.</p>
+            <p><i class="fas fa-calculator"></i> Estimated profit is calculated at $8.00 per order.</p>
+        </div>
+    </div>
+</body>
+</html>

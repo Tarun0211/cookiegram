@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Cookiegram</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9m0-1C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                <circle cx="8" cy="10" r="1.5"/>
+                <circle cx="12" cy="8" r="1.5"/>
+                <circle cx="15" cy="11" r="1.5"/>
+                <circle cx="10" cy="14" r="1.5"/>
+                <circle cx="14" cy="15" r="1.5"/>
+            </svg>
+            <span class="logo-text">Cookiegram</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/#about">About Us</a></li>
+            <li><a href="/#contact">Contact</a></li>
+            <li><a th:href="@{/login}" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+        </ul>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1>Login to Cookiegram</h1>
+            <div class="alert alert-success" th:if="${success}">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}">Success message</span>
+            </div>
+            <div class="alert alert-error" th:if="${error}">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span th:text="${error}">Invalid username or password. Please try again.</span>
+            </div>
+            <form th:action="@{/login}" method="post">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Username" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+            </form>
+            <p class="auth-link">
+                Don't have an account? <a th:href="@{/register}">Create Account</a>
+            </p>
+        </div>
+        <div class="auth-image">
+            <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=500&h=300&fit=crop" alt="Delicious Cookies">
+        </div>
+    </div>
+</body>
+</html>

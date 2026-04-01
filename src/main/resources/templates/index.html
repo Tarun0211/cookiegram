@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookiegram - Custom Message Cookie Delivery</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9m0-1C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                <circle cx="8" cy="10" r="1.5"/>
+                <circle cx="12" cy="8" r="1.5"/>
+                <circle cx="15" cy="11" r="1.5"/>
+                <circle cx="10" cy="14" r="1.5"/>
+                <circle cx="14" cy="15" r="1.5"/>
+            </svg>
+            <span class="logo-text">Cookiegram</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li sec:authorize="!isAuthenticated()">
+                <a th:href="@{/login}" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </li>
+            <li sec:authorize="isAuthenticated()">
+                <a th:href="@{/logout}" class="btn btn-outline">Logout</a>
+            </li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=800&h=400&fit=crop"
+             alt="Delicious Cookies" class="hero-image">
+        <h1>Welcome to Cookiegram!</h1>
+        <p>Delicious Cookie Gifts Delivered to Your Door</p>
+        <p class="hero-tagline">Send sweet surprises for any occasion.</p>
+        <div class="hero-buttons">
+            <a th:href="@{/login}" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+            <a th:href="@{/register}" class="btn btn-secondary">
+                <i class="fas fa-user-plus"></i> Create Account
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <h2>About Cookiegram</h2>
+        <p>Handcrafted cookie gifts delivered with love! Order personalized cookiegrams for birthdays, anniversaries, and special celebrations.</p>
+        <a href="#how-it-works" class="btn btn-primary">Learn More</a>
+    </section>
+
+    <section class="how-it-works" id="how-it-works">
+        <h2>How It Works</h2>
+        <div class="steps-container">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Choose Your Cookies</h3>
+                <p>Select from our delicious variety of handcrafted cookies and customize your message.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Add Your Message</h3>
+                <p>Write a personalized message that will be beautifully hand-decorated on your cookie.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>We Deliver</h3>
+                <p>We carefully package and deliver your cookies anywhere in Canada!</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="promotions-section">
+        <h2>Current Promotions</h2>
+        <div class="promotions-grid" th:if="${not #lists.isEmpty(promotions)}">
+            <div class="promo-card" th:each="promo : ${promotions}">
+                <img th:src="${promo.imageUrl != null ? promo.imageUrl : 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&h=300&fit=crop'}"
+                     th:alt="${promo.title}" class="promo-image">
+                <div class="promo-content">
+                    <h3 class="promo-title" th:text="${promo.title}">Promotion Title</h3>
+                    <p class="promo-description" th:text="${promo.description}">Promotion Description</p>
+                    <a th:href="@{/login}" class="btn btn-primary">View Deal</a>
+                </div>
+            </div>
+        </div>
+        <div class="no-promotions" th:if="${#lists.isEmpty(promotions)}">
+            <p>No current promotions. Check back soon for amazing deals!</p>
+        </div>
+    </section>
+
+    <footer class="footer" id="contact">
+        <div class="footer-links">
+            <a href="#">FAQ</a><span>|</span>
+            <a href="#">Terms of Service</a><span>|</span>
+            <a href="#">Privacy Policy</a>
+        </div>
+        <p>Follow Us</p>
+        <div class="social-icons">
+            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+        </div>
+        <p style="margin-top: 1.5rem; opacity: 0.8;">© 2026 Cookiegram. All rights reserved.</p>
+    </footer>
+</body>
+</html>

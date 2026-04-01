@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Cookiegram</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9m0-1C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                <circle cx="8" cy="10" r="1.5"/>
+                <circle cx="12" cy="8" r="1.5"/>
+                <circle cx="15" cy="11" r="1.5"/>
+                <circle cx="10" cy="14" r="1.5"/>
+                <circle cx="14" cy="15" r="1.5"/>
+            </svg>
+            <span class="logo-text">Cookiegram</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/#about">About Us</a></li>
+            <li><a href="/#contact">Contact</a></li>
+            <li><a th:href="@{/login}" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+        </ul>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1>Create Your Account</h1>
+            <form th:action="@{/register}" th:object="${registration}" method="post">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" th:field="*{fullName}" placeholder="John Doe"
+                           th:classappend="${#fields.hasErrors('fullName')} ? 'error' : ''">
+                    <span class="error-message" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Error</span>
+                </div>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" th:field="*{username}" placeholder="johndoe"
+                           th:classappend="${#fields.hasErrors('username') or (usernameError != null)} ? 'error' : ''">
+                    <span class="error-message" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Error</span>
+                    <span class="error-message" th:if="${usernameError != null}" th:text="${usernameError}">Username error</span>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email (Optional)</label>
+                    <input type="email" id="email" th:field="*{email}" placeholder="john@example.com"
+                           th:classappend="${#fields.hasErrors('email') or (emailError != null)} ? 'error' : ''">
+                    <span class="error-message" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Error</span>
+                    <span class="error-message" th:if="${emailError != null}" th:text="${emailError}">Email error</span>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" th:field="*{password}" placeholder="••••••"
+                           th:classappend="${#fields.hasErrors('password')} ? 'error' : ''">
+                    <span class="error-message" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Error</span>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" th:field="*{confirmPassword}" placeholder="••••••"
+                           th:classappend="${passwordError != null} ? 'error' : ''">
+                    <span class="error-message" th:if="${passwordError != null}" th:text="${passwordError}">Password error</span>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Create Account</button>
+            </form>
+            <p class="auth-link">
+                Already have an account? <a th:href="@{/login}">Login</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

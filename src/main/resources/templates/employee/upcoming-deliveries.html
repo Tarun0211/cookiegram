@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Deliveries - Cookiegram</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .delivery-section {
+            margin-bottom: 2rem;
+        }
+        .delivery-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-orange);
+        }
+        .delivery-section-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .delivery-count {
+            background: var(--primary-brown);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .summary-card {
+            background: var(--bg-paper);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .summary-card .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-brown);
+            display: block;
+        }
+        .summary-card .label {
+            color: var(--text-medium);
+            font-size: 0.95rem;
+        }
+        .delivery-card {
+            background: var(--white);
+            border: 1px solid #E0D5C7;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .delivery-info {
+            flex: 1;
+            min-width: 200px;
+        }
+        .delivery-customer {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+        .delivery-address {
+            color: var(--text-medium);
+            font-size: 0.9rem;
+        }
+        .delivery-meta {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .delivery-date {
+            background: var(--accent-cream);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+        .delivery-date .day {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-brown);
+        }
+        .delivery-date .month {
+            font-size: 0.8rem;
+            color: var(--text-medium);
+            text-transform: uppercase;
+        }
+        .status-form select {
+            padding: 0.5rem;
+            border: 1px solid #E0D5C7;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9m0-1C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                <circle cx="8" cy="10" r="1.5"/>
+                <circle cx="12" cy="8" r="1.5"/>
+                <circle cx="15" cy="11" r="1.5"/>
+                <circle cx="10" cy="14" r="1.5"/>
+                <circle cx="14" cy="15" r="1.5"/>
+            </svg>
+            <span class="logo-text">Cookiegram</span>
+        </a>
+        <ul class="nav-links">
+            <li><a th:href="@{/employee/dashboard}" data-testid="nav-dashboard">Dashboard</a></li>
+            <li><a th:href="@{/employee/orders}" data-testid="nav-orders">Orders</a></li>
+            <li><a th:href="@{/employee/upcoming-deliveries}" class="active" data-testid="nav-deliveries">Deliveries</a></li>
+            <li><a th:href="@{/logout}" class="btn btn-outline" data-testid="logout-btn">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="dashboard-container" data-testid="upcoming-deliveries">
+        <div class="dashboard-header">
+            <h1>Upcoming Deliveries</h1>
+            <p>Today and the next 7 days</p>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success" data-testid="success-message">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${successMessage}">Success message</span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-error" data-testid="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${errorMessage}">Error message</span>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards" data-testid="delivery-summary">
+            <div class="summary-card">
+                <span class="number" th:text="${summary.totalOrdersToday}">0</span>
+                <span class="label">Today's Deliveries</span>
+            </div>
+            <div class="summary-card">
+                <span class="number" th:text="${summary.ordersInPreparation}">0</span>
+                <span class="label">In Preparation</span>
+            </div>
+            <div class="summary-card">
+                <span class="number" th:text="${summary.readyForDelivery}">0</span>
+                <span class="label">Ready for Delivery</span>
+            </div>
+            <div class="summary-card">
+                <span class="number" th:text="${#lists.size(upcomingDeliveries)}">0</span>
+                <span class="label">Next 7 Days</span>
+            </div>
+        </div>
+
+        <!-- Today's Deliveries -->
+        <div class="content-card delivery-section" data-testid="today-deliveries">
+            <div class="delivery-section-header">
+                <h3>
+                    <i class="fas fa-calendar-day" style="color: var(--primary-brown);"></i>
+                    Today's Deliveries
+                </h3>
+                <span class="delivery-count" th:text="${#lists.size(todayDeliveries)} + ' orders'">0 orders</span>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(todayDeliveries)}" class="empty-state" data-testid="no-today-deliveries">
+                <i class="fas fa-check-circle" style="font-size: 2rem; color: var(--success-green); margin-bottom: 0.5rem;"></i>
+                <p>No deliveries scheduled for today</p>
+            </div>
+
+            <div th:each="order : ${todayDeliveries}" class="delivery-card" th:data-testid="${'today-order-' + order.id}">
+                <div class="delivery-info">
+                    <div class="delivery-customer" th:text="${order.customer.fullName}">Customer Name</div>
+                    <div class="delivery-address" th:text="${order.fullAddress}">Address</div>
+                    <div th:if="${order.customMessage != null && !order.customMessage.isEmpty()}" 
+                         style="font-style: italic; color: var(--text-light); margin-top: 0.25rem;">
+                        "<span th:text="${order.truncatedMessage}">Message</span>"
+                    </div>
+                </div>
+                <div class="delivery-meta">
+                    <span class="badge" 
+                          th:classappend="${order.status.name() == 'PLACED'} ? 'badge-pending' : 
+                                          (${order.status.name() == 'IN_PREPARATION'} ? 'badge-preparing' : 
+                                          (${order.status.name() == 'READY_FOR_DELIVERY'} ? 'badge-delivered' : 'badge-delivered'))"
+                          th:text="${order.status.displayName}">Status</span>
+                    
+                    <!-- Status update form -->
+                    <div th:if="${orderService.canUpdateStatus(order)}" class="status-form">
+                        <form th:action="@{/employee/orders/{id}/update-status(id=${order.id})}" method="post">
+                            <input type="hidden" name="redirectUrl" value="/employee/upcoming-deliveries">
+                            <select name="newStatus">
+                                <option th:if="${order.status.name() == 'PLACED'}" value="IN_PREPARATION">
+                                    In Preparation
+                                </option>
+                                <option th:if="${order.status.name() == 'IN_PREPARATION'}" value="READY_FOR_DELIVERY">
+                                    Ready for Delivery
+                                </option>
+                                <option th:if="${order.status.name() == 'READY_FOR_DELIVERY'}" value="DELIVERED">
+                                    Delivered
+                                </option>
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-small">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Deliveries (Next 7 Days) -->
+        <div class="content-card delivery-section" data-testid="next-7-days-deliveries">
+            <div class="delivery-section-header">
+                <h3>
+                    <i class="fas fa-calendar-week" style="color: var(--primary-brown);"></i>
+                    Next 7 Days
+                </h3>
+                <span class="delivery-count" th:text="${#lists.size(upcomingDeliveries)} + ' orders'">0 orders</span>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(upcomingDeliveries)}" class="empty-state" data-testid="no-upcoming-deliveries">
+                <i class="fas fa-calendar-xmark" style="font-size: 2rem; color: var(--text-light); margin-bottom: 0.5rem;"></i>
+                <p>No deliveries scheduled for the next 7 days</p>
+            </div>
+
+            <div th:each="order : ${upcomingDeliveries}" class="delivery-card" th:data-testid="${'upcoming-order-' + order.id}">
+                <div class="delivery-date">
+                    <div class="day" th:text="${#temporals.day(order.deliveryDate)}">15</div>
+                    <div class="month" th:text="${#temporals.format(order.deliveryDate, 'MMM')}">Jan</div>
+                </div>
+                <div class="delivery-info">
+                    <div class="delivery-customer" th:text="${order.customer.fullName}">Customer Name</div>
+                    <div class="delivery-address" th:text="${order.fullAddress}">Address</div>
+                </div>
+                <div class="delivery-meta">
+                    <span class="badge" 
+                          th:classappend="${order.status.name() == 'PLACED'} ? 'badge-pending' : 
+                                          (${order.status.name() == 'IN_PREPARATION'} ? 'badge-preparing' : 
+                                          (${order.status.name() == 'READY_FOR_DELIVERY'} ? 'badge-delivered' : 'badge-delivered'))"
+                          th:text="${order.status.displayName}">Status</span>
+                    
+                    <!-- Status update form -->
+                    <div th:if="${orderService.canUpdateStatus(order)}" class="status-form">
+                        <form th:action="@{/employee/orders/{id}/update-status(id=${order.id})}" method="post">
+                            <input type="hidden" name="redirectUrl" value="/employee/upcoming-deliveries">
+                            <select name="newStatus">
+                                <option th:if="${order.status.name() == 'PLACED'}" value="IN_PREPARATION">
+                                    In Preparation
+                                </option>
+                                <option th:if="${order.status.name() == 'IN_PREPARATION'}" value="READY_FOR_DELIVERY">
+                                    Ready for Delivery
+                                </option>
+                                <option th:if="${order.status.name() == 'READY_FOR_DELIVERY'}" value="DELIVERED">
+                                    Delivered
+                                </option>
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-small">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="info-panel">
+            <p><i class="fas fa-info-circle"></i> <strong>Note:</strong> 
+                Update order status as you prepare and deliver orders.</p>
+            <p><i class="fas fa-sync-alt"></i> Orders with past delivery dates are automatically marked as Delivered.</p>
+        </div>
+    </div>
+</body>
+</html>

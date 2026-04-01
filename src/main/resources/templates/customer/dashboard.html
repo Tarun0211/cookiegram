@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard - Cookiegram</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9m0-1C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                <circle cx="8" cy="10" r="1.5"/>
+                <circle cx="12" cy="8" r="1.5"/>
+                <circle cx="15" cy="11" r="1.5"/>
+                <circle cx="10" cy="14" r="1.5"/>
+                <circle cx="14" cy="15" r="1.5"/>
+            </svg>
+            <span class="logo-text">Cookiegram</span>
+        </a>
+        <ul class="nav-links">
+            <li><a th:href="@{/customer/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/customer/order/new}">New Order</a></li>
+            <li><a th:href="@{/logout}" class="btn btn-outline">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="alert alert-success" th:if="${success}">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${success}">Success message</span>
+        </div>
+        <div class="alert alert-error" th:if="${error}">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span th:text="${error}">Error message</span>
+        </div>
+
+        <div class="dashboard-header">
+            <h1>Customer Dashboard</h1>
+            <p>Welcome back, <span th:text="${user?.fullName ?: username}">Customer</span>!</p>
+        </div>
+
+        <div class="action-cards">
+            <a th:href="@{/customer/order/new}" class="action-card action-card-primary">
+                <svg class="action-card-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>
+                </svg>
+                <h3>Start New Order</h3>
+                <p>Send a custom cookie message</p>
+            </a>
+            <a href="#order-history" class="action-card">
+                <svg class="action-card-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+                <h3>Order History</h3>
+                <p th:text="${#lists.size(orders)} + ' orders'">0 orders</p>
+            </a>
+            <a href="#" class="action-card">
+                <svg class="action-card-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+                <h3>Account Settings</h3>
+                <span class="coming-soon">Coming Soon</span>
+            </a>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="main-content">
+                <div class="content-card" id="order-history">
+                    <div class="content-card-header">
+                        <h2><i class="fas fa-history"></i> Order History</h2>
+                    </div>
+                    <div th:if="${hasOrders}">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Delivery Date</th>
+                                    <th>Message</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="order : ${orders}">
+                                    <td th:text="'#' + ${order.id}">#12345</td>
+                                    <td th:text="${#temporals.format(order.deliveryDate, 'MMM dd, yyyy')}">Jan 01, 2026</td>
+                                    <td th:text="${order.truncatedMessage}">Happy Birthday...</td>
+                                    <td>
+                                        <span class="badge"
+                                              th:classappend="${order.status.name() == 'PLACED'} ? 'badge-pending' :
+                                                             (${order.status.name() == 'IN_PREPARATION'} ? 'badge-preparing' :
+                                                             (${order.status.name() == 'DELIVERED'} ? 'badge-delivered' : 'badge-cancelled'))"
+                                              th:text="${order.status.displayName}">Status</span>
+                                    </td>
+                                    <td>
+                                        <form th:if="${order.canBeCancelled()}"
+                                              th:action="@{/customer/order/cancel/{id}(id=${order.id})}"
+                                              method="post"
+                                              onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                            <button type="submit" class="btn btn-small btn-danger">Cancel</button>
+                                        </form>
+                                        <span th:unless="${order.canBeCancelled()}" class="text-muted">-</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div th:unless="${hasOrders}" style="text-align:center; padding:3rem;">
+                        <i class="fas fa-cookie-bite" style="font-size:4rem; color:var(--primary-brown-light); margin-bottom:1rem; display:block;"></i>
+                        <h3 style="color:var(--primary-brown); margin-bottom:0.5rem;">No Orders Yet</h3>
+                        <p style="color:var(--text-medium); margin-bottom:1.5rem;">You haven't placed any orders yet. Start by creating your first cookiegram!</p>
+                        <a th:href="@{/customer/order/new}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Create Your First Order
+                        </a>
+                    </div>
+                </div>
+                <div class="info-panel">
+                    <p><i class="fas fa-calendar-alt"></i> Orders can be scheduled up to 1 year in advance</p>
+                    <p><i class="fas fa-clock"></i> Minimum 3 days preparation time required</p>
+                    <p><i class="fas fa-times-circle"></i> Cancellations allowed up to 3 days before delivery</p>
+                </div>
+            </div>
+
+            <div class="promo-sidebar">
+                <h3 style="margin-bottom: 1rem; color: var(--primary-brown);">Current Promotions</h3>
+                <div th:each="promo : ${promotions}" class="promo-card">
+                    <img th:src="${promo.imageUrl != null ? promo.imageUrl : 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&h=200&fit=crop'}"
+                         th:alt="${promo.title}" class="promo-image">
+                    <div class="promo-content">
+                        <h3 class="promo-title" th:text="${promo.title}">Promotion</h3>
+                        <p class="promo-description" th:text="${promo.description}">Description</p>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(promotions)}" style="text-align:center; padding:1rem; color:var(--text-light);">
+                    <p>No promotions available right now.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .action-card-primary { background: linear-gradient(135deg, var(--primary-brown) 0%, var(--primary-brown-dark) 100%); color: white !important; }
+        .action-card-primary h3, .action-card-primary p { color: white !important; }
+        .action-card-primary .action-card-icon { color: var(--accent-cream) !important; }
+    </style>
+</body>
+</html>

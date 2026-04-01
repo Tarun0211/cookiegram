@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Cookiegram</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .order-container { max-width: 700px; margin: 0 auto; padding: 2rem; }
+        .progress-steps { display: flex; align-items: center; justify-content: center; margin-bottom: 2rem; gap: 0.5rem; flex-wrap: wrap; }
+        .step { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+        .step-circle { width: 36px; height: 36px; border-radius: 50%; background: #E0D5C7; color: var(--text-medium); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.95rem; }
+        .step.active .step-circle { background: var(--primary-brown); color: white; }
+        .step.completed .step-circle { background: var(--success-green); color: white; }
+        .step span { font-size: 0.85rem; color: var(--text-medium); }
+        .step.active span, .step.completed span { color: var(--primary-brown); font-weight: 600; }
+        .step-line { width: 60px; height: 2px; background: #E0D5C7; }
+        .step-line.active { background: var(--success-green); }
+        .order-card { background: var(--bg-paper); border-radius: var(--border-radius-lg); padding: 2.5rem; box-shadow: var(--shadow-lg); }
+        .order-card > h1 { text-align: center; margin-bottom: 0.5rem; }
+        .subtitle { text-align: center; color: var(--text-medium); margin-bottom: 2rem; }
+        .form-section { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #E0D5C7; }
+        .form-section h2 { font-size: 1.1rem; color: var(--primary-brown); margin-bottom: 1rem; }
+        .form-section h2 i { margin-right: 0.5rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .card-icons { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+        .card-icons i { font-size: 1.5rem; color: var(--text-light); }
+        .checkbox-group { display: flex; align-items: center; gap: 0.75rem; margin: 1rem 0; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .checkbox-group label { cursor: pointer; color: var(--text-medium); }
+        .order-summary { background: var(--accent-cream); padding: 1.5rem; border-radius: var(--border-radius); margin: 2rem 0; }
+        .order-summary h2 { font-size: 1rem; color: var(--primary-brown); margin-bottom: 1rem; }
+        .summary-row { display: flex; justify-content: space-between; padding: 0.5rem 0; color: var(--text-medium); }
+        .summary-total { display: flex; justify-content: space-between; padding-top: 1rem; border-top: 2px solid var(--primary-brown-light); margin-top: 0.5rem; font-weight: 700; font-size: 1.25rem; color: var(--primary-brown-dark); }
+        .form-actions { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; }
+        .btn-large { padding: 1rem 2rem; font-size: 1.1rem; }
+        .form-hint { display: block; margin-top: 0.5rem; color: var(--text-light); font-size: 0.85rem; }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .form-actions { flex-direction: column; } .form-actions .btn { width: 100%; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9m0-1C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                <circle cx="8" cy="10" r="1.5"/>
+                <circle cx="12" cy="8" r="1.5"/>
+                <circle cx="15" cy="11" r="1.5"/>
+                <circle cx="10" cy="14" r="1.5"/>
+                <circle cx="14" cy="15" r="1.5"/>
+            </svg>
+            <span class="logo-text">Cookiegram</span>
+        </a>
+        <ul class="nav-links">
+            <li><a th:href="@{/customer/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/logout}" class="btn btn-outline">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="order-container">
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="step completed">
+                <div class="step-circle"><i class="fas fa-check"></i></div>
+                <span>Order Details</span>
+            </div>
+            <div class="step-line active"></div>
+            <div class="step completed">
+                <div class="step-circle"><i class="fas fa-check"></i></div>
+                <span>Review</span>
+            </div>
+            <div class="step-line active"></div>
+            <div class="step active">
+                <div class="step-circle">3</div>
+                <span>Payment</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+                <div class="step-circle">4</div>
+                <span>Confirmation</span>
+            </div>
+        </div>
+
+        <div class="order-card">
+            <h1><i class="fas fa-lock"></i> Secure Payment</h1>
+            <p class="subtitle">Enter your payment details to complete your order</p>
+
+            <div class="alert alert-error" th:if="${error}">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span th:text="${error}">Error message</span>
+            </div>
+
+            <form th:action="@{/customer/order/payment/process}" th:object="${paymentForm}" method="post" id="paymentForm">
+
+                <!-- Card Information -->
+                <div class="form-section">
+                    <h2><i class="fas fa-credit-card"></i> Card Information</h2>
+                    <div class="form-group">
+                        <label for="cardholderName">Cardholder Name *</label>
+                        <input type="text" id="cardholderName" th:field="*{cardholderName}"
+                               placeholder="John Doe"
+                               th:classappend="${#fields.hasErrors('cardholderName')} ? 'error' : ''">
+                        <span class="error-message" th:if="${#fields.hasErrors('cardholderName')}" th:errors="*{cardholderName}">Error</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="cardNumber">Card Number *</label>
+                        <input type="text" id="cardNumber" th:field="*{cardNumber}"
+                               placeholder="1234 5678 9012 3456" maxlength="16"
+                               th:classappend="${#fields.hasErrors('cardNumber')} ? 'error' : ''">
+                        <span class="error-message" th:if="${#fields.hasErrors('cardNumber')}" th:errors="*{cardNumber}">Error</span>
+                        <div class="card-icons">
+                            <i class="fab fa-cc-visa"></i>
+                            <i class="fab fa-cc-mastercard"></i>
+                            <i class="fab fa-cc-amex"></i>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expiryDate">Expiry Date *</label>
+                            <input type="text" id="expiryDate" th:field="*{expiryDate}"
+                                   placeholder="MM/YY" maxlength="5"
+                                   th:classappend="${#fields.hasErrors('expiryDate')} ? 'error' : ''">
+                            <span class="error-message" th:if="${#fields.hasErrors('expiryDate')}" th:errors="*{expiryDate}">Error</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv">CVV *</label>
+                            <input type="text" id="cvv" th:field="*{cvv}"
+                                   placeholder="123" maxlength="4"
+                                   th:classappend="${#fields.hasErrors('cvv')} ? 'error' : ''">
+                            <span class="error-message" th:if="${#fields.hasErrors('cvv')}" th:errors="*{cvv}">Error</span>
+                        </div>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="saveCard" th:field="*{saveCard}">
+                        <label for="saveCard">Save card for future orders</label>
+                    </div>
+                </div>
+
+                <!-- Billing Address -->
+                <div class="form-section">
+                    <h2><i class="fas fa-file-invoice"></i> Billing Address</h2>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="sameAsDelivery" th:field="*{sameAsDelivery}" checked>
+                        <label for="sameAsDelivery">Same as delivery address</label>
+                    </div>
+                    <div id="billingFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="billingStreet">Street Address</label>
+                            <input type="text" id="billingStreet" th:field="*{billingStreet}" placeholder="123 Main Street">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="billingCity">City</label>
+                                <input type="text" id="billingCity" th:field="*{billingCity}" placeholder="City">
+                            </div>
+                            <div class="form-group">
+                                <label for="billingProvince">Province</label>
+                                <input type="text" id="billingProvince" th:field="*{billingProvince}" placeholder="Province">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="billingPostalCode">Postal Code</label>
+                            <input type="text" id="billingPostalCode" th:field="*{billingPostalCode}" placeholder="A1A 1A1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promo Code -->
+                <div class="form-section">
+                    <h2><i class="fas fa-tag"></i> Promo Code</h2>
+                    <div class="form-group">
+                        <input type="text" id="promoCode" th:field="*{promoCode}"
+                               placeholder="Enter promo code" disabled>
+                        <small class="form-hint">Promo codes coming soon!</small>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="order-summary">
+                    <h2>Order Summary</h2>
+                    <div class="summary-row">
+                        <span>Cookiegram</span>
+                        <span th:text="'$' + ${price} + ' CAD'">$24.99 CAD</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Delivery</span>
+                        <span>Included</span>
+                    </div>
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span th:text="'$' + ${price} + ' CAD'">$24.99 CAD</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <a th:href="@{/customer/order/payment}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-large" id="submitBtn">
+                        <i class="fas fa-lock"></i> Confirm Order -
+                        <span th:text="'$' + ${price}">$24.99</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Toggle billing address
+        const sameAsDelivery = document.getElementById('sameAsDelivery');
+        const billingFields = document.getElementById('billingFields');
+        sameAsDelivery.addEventListener('change', function() {
+            billingFields.style.display = this.checked ? 'none' : 'block';
+        });
+
+        // Format card number - digits only
+        const cardNumber = document.getElementById('cardNumber');
+        cardNumber.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '').substring(0, 16);
+        });
+
+        // Format expiry date MM/YY
+        const expiryDate = document.getElementById('expiryDate');
+        expiryDate.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            e.target.value = value;
+        });
+
+        // Prevent double submission
+        const form = document.getElementById('paymentForm');
+        const submitBtn = document.getElementById('submitBtn');
+        let isSubmitting = false;
+        form.addEventListener('submit', function(e) {
+            if (isSubmitting) { e.preventDefault(); return false; }
+            isSubmitting = true;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        });
+    </script>
+</body>
+</html>
